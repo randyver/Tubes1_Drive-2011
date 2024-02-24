@@ -47,15 +47,20 @@ class MyBotLogic(BaseLogic):
 
         return delta_x, delta_y
 
-    def nearest_diamond_from_player(self, current_position: Position, board: Board):
+    def nearest_diamond_from_player(self, board_bot: GameObject, board: Board):
         diamonds = board.diamonds
-        if not diamonds:
-            return None
-
-        distances = [abs(current_position.x - diamond.position.x) + abs(current_position.y - diamond.position.y) for diamond in diamonds]
-        nearest_diamond_index = distances.index(min(distances))
-        
-        return diamonds[nearest_diamond_index].position, distances[nearest_diamond_index]
+        if board_bot.properties.diamonds == 4:
+            blue_diamonds = [diamond for diamond in diamonds if diamond.properties.points == 1]
+            current_position = board_bot.position
+            distances = [abs(current_position.x - diamond.position.x) + abs(board_bot.position.y - diamond.position.y) for diamond in blue_diamonds]
+            nearest_diamond_index = distances.index(min(distances))
+            return blue_diamonds[nearest_diamond_index].position, distances[nearest_diamond_index]
+        else:
+            diamonds = [diamond for diamond in diamonds]
+            current_position = board_bot.position
+            distances = [abs(current_position.x - diamond.position.x) + abs(board_bot.position.y - diamond.position.y) for diamond in diamonds]
+            nearest_diamond_index = distances.index(min(distances))
+            return diamonds[nearest_diamond_index].position, distances[nearest_diamond_index]
     
     def nearest_diamond_from_base(self, board_bot :GameObject, board: Board):
         # Check for diamonds
