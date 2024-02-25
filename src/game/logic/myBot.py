@@ -14,15 +14,8 @@ class MyBotLogic(BaseLogic):
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
         current_position = board_bot.position
-        if props.diamonds == 4:
-            target_from_base,min_distance_from_base = self.nearest_diamond_from_base(board_bot, board) 
-            target_from_player,min_distance_from_player = self.nearest_diamond_from_player(board_bot, board) 
-            if min_distance_from_base > min_distance_from_player:
-                self.goal_position = target_from_player
-            else:
-                self.goal_position = target_from_base
 
-        elif props.diamonds == 5:
+        if props.diamonds == 5:
             # Move to base
             base = board_bot.properties.base
             self.goal_position = base
@@ -34,7 +27,6 @@ class MyBotLogic(BaseLogic):
                 self.goal_position = goal_from_player
             else:
                 self.goal_position = goal_from_base
-            # self.goal_position = goal_from_player
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -73,11 +65,11 @@ class MyBotLogic(BaseLogic):
                     if diamond_distance < min_distance:
                         min_distance = diamond_distance
                         target = gameObjects.position
-            return target,min_distance
+            return target, min_distance
         else:
             for diamond in board.diamonds:
                 diamond_distance = abs(diamond.position.x - base.x) + abs(diamond.position.y - base.y)
                 if diamond_distance < min_distance:
                     min_distance = diamond_distance
                     target = diamond.position    
-            return target,min_distance
+            return target, min_distance
