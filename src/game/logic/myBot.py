@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
@@ -16,9 +16,8 @@ class MyBotLogic(BaseLogic):
         current_position = board_bot.position
 
         if props.diamonds == 5:
-            # Move to base
-            base = board_bot.properties.base
-            self.goal_position = base
+            target_position = self.using_teleport(board_bot, board)
+            self.goal_position = target_position
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
             goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
@@ -73,3 +72,35 @@ class MyBotLogic(BaseLogic):
                     min_distance = diamond_distance
                     target = diamond.position    
             return target, min_distance
+        
+    def using_teleport(self, board_bot: GameObject, board: Board):
+        base = board_bot.properties.base
+        current_position = board_bot.position
+        teleport_objects: List[Position] = []
+
+        for game_object in board.game_objects:
+            if game_object.type == "TeleportGameObject":
+                teleport_objects.append(game_object.position)
+
+        distance_teleport_first_from_bot = abs(teleport_objects[0].x - current_position.x) + abs(teleport_objects[0].y - current_position.y)
+        distance_teleport_second_from_bot = abs(teleport_objects[1].x - current_position.x) + abs(teleport_objects[1].y - current_position.y)
+        distance_teleport_first_from_base = abs(teleport_objects[0].x - base.x) + abs(teleport_objects[0].y - base.y)
+        distance_teleport_second_from_base = abs(teleport_objects[1].x - base.x) + abs(teleport_objects[1].y - base.y)
+        distance_bot_from_base = abs(current_position.x - base.x) + abs(current_position.y - base.y)
+
+        if distance_teleport_first_from_bot <= distance_teleport_second_from_bot:
+            if (distance_teleport_first_from_bot + distance_teleport_second_from_base) <= distance_bot_from_base:
+                target_position = teleport_objects[0]
+            else:
+                target_position = base
+
+        else:
+            if (distance_teleport_second_from_bot + distance_teleport_first_from_base) <= distance_bot_from_base:
+                target_position = teleport_objects[1]
+            else:
+                target_position = base
+
+        return target_position
+
+
+    
