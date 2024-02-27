@@ -31,20 +31,23 @@ class MyBotLogic(BaseLogic):
 
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
-            diamond_from_base, min_distance_diamond_base = self.nearest_diamond_from_base(board_bot, board)
-            diamond_from_bot, min_distance_diamond_bot = self.nearest_diamond_from_bot(board_bot, board)
-            if min_distance_diamond_base > min_distance_diamond_bot:
-                nearest_enemy_position, min_distance_enemy = self.nearest_enemy(board_bot, board, min_distance_diamond_bot)
-                if (min_distance_diamond_bot < min_distance_enemy):
-                    self.goal_position = diamond_from_bot
+            if (board_bot.properties.milliseconds_left < 9000):
+                self.goal_position = base
+            elif (board_bot.properties.milliseconds_left <= 25000):
+                goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
+                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
+                if (min_distance_base > min_distance_tackle):
+                    self.goal_position = goal_tackle
                 else:
-                    self.goal_position = nearest_enemy_position
+
+                    self.goal_position = goal_from_base
             else:
-                nearest_enemy_position, min_distance_enemy = self.nearest_enemy(board_bot, board, min_distance_diamond_base)
-                if (min_distance_diamond_base < min_distance_enemy):
-                    self.goal_position = diamond_from_base
+                goal_from_player, min_distance_player = self.nearest_diamond_from_player(board_bot, board)
+                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_player)
+                if (min_distance_player < min_distance_tackle):
+                    self.goal_position = goal_from_player
                 else:
-                    self.goal_position = nearest_enemy_position
+                    self.goal_position = goal_tackle
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
