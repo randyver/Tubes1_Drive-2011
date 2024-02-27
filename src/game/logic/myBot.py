@@ -10,14 +10,24 @@ class MyBotLogic(BaseLogic):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
         self.current_direction = 0
+        self.is_using_teleport_to_base = False
         
     def next_move(self, board_bot: GameObject, board: Board):
+
         props = board_bot.properties
         current_position = board_bot.position
+        base = board_bot.properties.base
 
         if props.diamonds == 5:
-            target_position = self.using_teleport(board_bot, board)
-            self.goal_position = target_position
+            if self.is_using_teleport_to_base:
+                self.goal_position = base
+
+            elif not self.is_using_teleport_to_base:
+                target_position = self.using_teleport(board_bot, board)
+                self.goal_position = target_position
+                if target_position == current_position:
+                    self.is_using_teleport = True
+
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
             goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
