@@ -18,6 +18,7 @@ class MyBotLogic(BaseLogic):
         current_position = board_bot.position
         base = board_bot.properties.base
 
+        # jika diamonds sudah 5
         if props.diamonds == 5:
             if self.is_using_teleport_to_base:
                 self.goal_position = base
@@ -30,20 +31,20 @@ class MyBotLogic(BaseLogic):
 
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
-            goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
-            goal_from_player, min_distance_player = self.nearest_diamond_from_player(board_bot, board)
-            if min_distance_base > min_distance_player:
-                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_player)
-                if (min_distance_player < min_distance_tackle):
-                    self.goal_position = goal_from_player
+            diamond_from_base, min_distance_diamond_base = self.nearest_diamond_from_base(board_bot, board)
+            diamond_from_bot, min_distance_diamond_bot = self.nearest_diamond_from_bot(board_bot, board)
+            if min_distance_diamond_base > min_distance_diamond_bot:
+                nearest_enemy_position, min_distance_enemy = self.nearest_enemy(board_bot, board, min_distance_diamond_bot)
+                if (min_distance_diamond_bot < min_distance_enemy):
+                    self.goal_position = diamond_from_bot
                 else:
-                    self.goal_position = goal_tackle
+                    self.goal_position = nearest_enemy_position
             else:
-                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
-                if (min_distance_base < min_distance_tackle):
-                    self.goal_position = goal_from_base
+                nearest_enemy_position, min_distance_enemy = self.nearest_enemy(board_bot, board, min_distance_diamond_base)
+                if (min_distance_diamond_base < min_distance_enemy):
+                    self.goal_position = diamond_from_base
                 else:
-                    self.goal_position = goal_tackle
+                    self.goal_position = nearest_enemy_position
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -56,53 +57,61 @@ class MyBotLogic(BaseLogic):
 
         return delta_x, delta_y
 
-    def nearest_diamond_from_player(self, board_bot: GameObject, board: Board):
+    # jarak diamond terdekat dengan bot
+    def nearest_diamond_from_bot(self, board_bot: GameObject, board: Board):
         diamonds = board.diamonds
         if board_bot.properties.diamonds == 4:
             blue_diamonds = [diamond for diamond in diamonds if diamond.properties.points == 1]
             current_position = board_bot.position
             distances = [abs(current_position.x - diamond.position.x) + abs(board_bot.position.y - diamond.position.y) for diamond in blue_diamonds]
             nearest_diamond_index = distances.index(min(distances))
-            return blue_diamonds[nearest_diamond_index].position, distances[nearest_diamond_index]
+            diamond_from_bot = blue_diamonds[nearest_diamond_index].position
+            min_distance_diamond_bot = distances[nearest_diamond_index]
+            return diamond_from_bot, min_distance_diamond_bot
         else:
             diamonds = [diamond for diamond in diamonds]
             current_position = board_bot.position
             distances = [abs(current_position.x - diamond.position.x) + abs(board_bot.position.y - diamond.position.y) for diamond in diamonds]
             nearest_diamond_index = distances.index(min(distances))
-            return diamonds[nearest_diamond_index].position, distances[nearest_diamond_index]
+            diamond_from_bot = diamonds[nearest_diamond_index].position
+            min_distance_diamond_bot = distances[nearest_diamond_index]
+            return diamond_from_bot, min_distance_diamond_bot
     
+    # jarak diamond terdekat dengan base
     def nearest_diamond_from_base(self, board_bot :GameObject, board: Board):
         # Check for diamonds
         base = board_bot.properties.base
-        min_distance = 100000
+        min_distance_diamond_base = 100000
         if(board_bot.properties.diamonds == 4):
             for gameObjects in board.game_objects:
                 if (gameObjects.type == "DiamondGameObject" and gameObjects.properties.points == 1):
                     diamond_distance = abs(gameObjects.position.x - base.x) + abs(gameObjects.position.y - base.y)
-                    if diamond_distance < min_distance:
-                        min_distance = diamond_distance
-                        target = gameObjects.position
-            return target, min_distance
+                    if diamond_distance < min_distance_diamond_base:
+                        min_distance_diamond_base = diamond_distance
+                        diamond_from_base = gameObjects.position
+            return diamond_from_base, min_distance_diamond_base
         else:
             for diamond in board.diamonds:
                 diamond_distance = abs(diamond.position.x - base.x) + abs(diamond.position.y - base.y)
-                if diamond_distance < min_distance:
-                    min_distance = diamond_distance
-                    target = diamond.position    
-            return target, min_distance
+                if diamond_distance < min_distance_diamond_base:
+                    min_distance_diamond_base = diamond_distance
+                    diamond_from_base = diamond.position    
+            return diamond_from_base, min_distance_diamond_base
         
+    # jarak terdekat bot lawan    
     def nearest_enemy(self, board_bot: GameObject, board: Board, diamond_distance):
-        min_distance = 100000
+        min_distance_enemy = 100000
         current_position = board_bot.position
         nearest_enemy_position = None
         for enemy_bot in board.bots:
             if (enemy_bot != board_bot):
                 if (5 * enemy_bot.properties.diamonds >= diamond_distance):
-                    if (abs(enemy_bot.position.x - current_position.x) + abs(enemy_bot.position.y - current_position.y) < min_distance):
-                        min_distance = abs(enemy_bot.position.x - current_position.x) + abs(enemy_bot.position.y - current_position.y)
+                    if (abs(enemy_bot.position.x - current_position.x) + abs(enemy_bot.position.y - current_position.y) < min_distance_enemy):
+                        min_distance_enemy = abs(enemy_bot.position.x - current_position.x) + abs(enemy_bot.position.y - current_position.y)
                         nearest_enemy_position = enemy_bot.position
-        return nearest_enemy_position, min_distance
+        return nearest_enemy_position, min_distance_enemy
 
+    # gunakan teleport saat pulang ke base (diamond sudah berjumlah 5)
     def using_teleport(self, board_bot: GameObject, board: Board):
         base = board_bot.properties.base
         current_position = board_bot.position
