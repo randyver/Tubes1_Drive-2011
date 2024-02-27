@@ -42,7 +42,7 @@ class MyBotLogic(BaseLogic):
 
                     self.goal_position = goal_from_base
             else:
-                goal_from_player, min_distance_player = self.nearest_diamond_from_player(board_bot, board)
+                goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
                 goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_player)
                 if (min_distance_player < min_distance_tackle):
                     self.goal_position = goal_from_player
