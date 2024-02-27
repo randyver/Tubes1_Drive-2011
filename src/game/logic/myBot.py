@@ -33,9 +33,17 @@ class MyBotLogic(BaseLogic):
             goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
             goal_from_player, min_distance_player = self.nearest_diamond_from_player(board_bot, board)
             if min_distance_base > min_distance_player:
-                self.goal_position = goal_from_player
+                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_player)
+                if (min_distance_player < min_distance_tackle):
+                    self.goal_position = goal_from_player
+                else:
+                    self.goal_position = goal_tackle
             else:
-                self.goal_position = goal_from_base
+                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
+                if (min_distance_base < min_distance_tackle):
+                    self.goal_position = goal_from_base
+                else:
+                    self.goal_position = goal_tackle
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -83,6 +91,18 @@ class MyBotLogic(BaseLogic):
                     target = diamond.position    
             return target, min_distance
         
+    def nearest_enemy(self, board_bot: GameObject, board: Board, diamond_distance):
+        min_distance = 100000
+        current_position = board_bot.position
+        nearest_enemy_position = None
+        for enemy_bot in board.bots:
+            if (enemy_bot != board_bot):
+                if (5 * enemy_bot.properties.diamonds >= diamond_distance):
+                    if (abs(enemy_bot.position.x - current_position.x) + abs(enemy_bot.position.y - current_position.y) < min_distance):
+                        min_distance = abs(enemy_bot.position.x - current_position.x) + abs(enemy_bot.position.y - current_position.y)
+                        nearest_enemy_position = enemy_bot.position
+        return nearest_enemy_position, min_distance
+
     def using_teleport(self, board_bot: GameObject, board: Board):
         base = board_bot.properties.base
         current_position = board_bot.position
