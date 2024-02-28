@@ -44,6 +44,7 @@ class MyBotLogic(BaseLogic):
             else:
                 goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
                 goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_player)
+                goal_button = self.using_button(board_bot, board, min_distance_player)
                 if (min_distance_player < min_distance_tackle):
                     self.goal_position = goal_from_player
                 else:
@@ -145,4 +146,22 @@ class MyBotLogic(BaseLogic):
         return target_position
 
 
+    def using_button(self, board_bot: GameObject, board: Board, min_distance_diamond_bot: int):
+        current_position = board_bot.position
+        button_position: List[Position] = []
+
+        for game_object in board.game_objects:
+            if game_object.type == "DiamondButtonProvider":
+                button_position.append(game_object.position)
+                break
+        
+        distance_bot_button = abs(current_position.x - button_position[0].x) + abs(current_position.y - button_position[0].y)
+
+        if (min_distance_diamond_bot > 9 and distance_bot_button < min_distance_diamond_bot):
+            target_position = button_position[0]
+
+        return target_position
+        
+        
+        
     
