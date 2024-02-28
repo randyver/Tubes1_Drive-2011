@@ -7,7 +7,7 @@ from game.models import GameObject, Board, Position, Properties
 from ..util import get_direction
 
 
-class MyBotLogic(BaseLogic):
+class DummyBotLogic(BaseLogic):
     def __init__(self):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None

@@ -7,7 +7,7 @@ from game.board_handler import BoardHandler
 from game.bot_handler import BotHandler
 from game.logic.random import RandomLogic
 from game.logic.myBot import MyBotLogic
-from game.logic.testBot import MyBotLogic
+from game.logic.testBot import DummyBotLogic
 from game.util import *
 from game.logic.base import BaseLogic
 
@@ -17,7 +17,7 @@ DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
     "MyBot" : MyBotLogic,
-    "testBot" : MyBotLogic
+    "testBot" : DummyBotLogic
 }
 
 ###############################################################################
