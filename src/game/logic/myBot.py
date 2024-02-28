@@ -36,11 +36,11 @@ class MyBotLogic(BaseLogic):
             elif (board_bot.properties.milliseconds_left <= 25000):
                 goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
                 goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
-                goal_button = self.using_button(board_bot, board, min_distance_base)
+                goal_button, is_using_button = self.using_button(board_bot, board, min_distance_base)
                 if (min_distance_base > min_distance_tackle):
                     self.goal_position = goal_tackle
                 else:
-                    if goal_button:
+                    if is_using_button:
                         self.goal_position = goal_button
                     else:
                         self.goal_position = goal_from_base
@@ -160,9 +160,12 @@ class MyBotLogic(BaseLogic):
         distance_bot_button = abs(current_position.x - button_position[0].x) + abs(current_position.y - button_position[0].y)
 
         if (min_distance_base > 5 and distance_bot_button < min_distance_base):
-            target_position = button_position[0]
+            is_using_button = True
+        
+        else:
+            is_using_button = False
 
-        return target_position
+        return button_position[0], is_using_button
         
         
         
