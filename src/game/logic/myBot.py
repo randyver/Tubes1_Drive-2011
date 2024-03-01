@@ -31,12 +31,17 @@ class MyBotLogic(BaseLogic):
 
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
+            goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
+            goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
+            goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
+            goal_button, is_using_button = self.using_button(board_bot, board, min_distance_base)
+
             if (board_bot.properties.milliseconds_left < 9000):
-                self.goal_position = base
+                if min_distance_base <= 2:
+                    self.goal_position = goal_from_base
+                else:
+                    self.goal_position = base
             elif (board_bot.properties.milliseconds_left <= 25000):
-                goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
-                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
-                goal_button, is_using_button = self.using_button(board_bot, board, min_distance_base)
                 if (min_distance_base > min_distance_tackle):
                     self.goal_position = goal_tackle
                 else:
@@ -45,8 +50,6 @@ class MyBotLogic(BaseLogic):
                     else:
                         self.goal_position = goal_from_base
             else:
-                goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
-                goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_player)
                 if (min_distance_player < min_distance_tackle):
                     self.goal_position = goal_from_player
                 else:
@@ -147,7 +150,7 @@ class MyBotLogic(BaseLogic):
 
         return target_position
 
-
+    # menggunakan button jika posisi diamonds jauh dari bot sehingga memungkinkan bot memperoleh diamond lebih dekat      
     def using_button(self, board_bot: GameObject, board: Board, min_distance_base: int):
         current_position = board_bot.position
         button_position: List[Position] = []
