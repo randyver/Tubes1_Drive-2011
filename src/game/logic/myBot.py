@@ -20,14 +20,20 @@ class MyBotLogic(BaseLogic):
 
         # jika diamonds sudah 5
         if props.diamonds == 5:
+            target_teleport_position = self.using_teleport(board_bot, board)
             if self.is_using_teleport_to_base:
-                self.goal_position = base
+                if self.goal_position != target_teleport_position:
+                    self.goal_position = base
+                else:
+                    self.is_using_teleport = True
 
             elif not self.is_using_teleport_to_base:
-                target_position = self.using_teleport(board_bot, board)
-                self.goal_position = target_position
-                if target_position == current_position:
+                self.goal_position = target_teleport_position
+                if target_teleport_position == current_position:
                     self.is_using_teleport = True
+
+            else:
+                self.goal_position = base
 
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
