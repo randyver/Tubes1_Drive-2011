@@ -39,8 +39,8 @@ class MyBotLogic(BaseLogic):
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
             goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
             goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
-            goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
-            goal_button, is_using_button = self.using_button(board_bot, board, min_distance_base)
+            min_distance = min(min_distance_base, min_distance_player)
+            goal_button, is_using_button = self.using_button(board_bot, board, min_distance)
 
             if (board_bot.properties.milliseconds_left < 15000):
                 if min_distance_base <= 5:
@@ -152,7 +152,7 @@ class MyBotLogic(BaseLogic):
         return target_position
 
     # menggunakan button jika posisi diamonds jauh dari bot sehingga memungkinkan bot memperoleh diamond lebih dekat      
-    def using_button(self, board_bot: GameObject, board: Board, min_distance_base: int):
+    def using_button(self, board_bot: GameObject, board: Board, min_distance: int):
         current_position = board_bot.position
         button_position: List[Position] = []
 
@@ -163,7 +163,7 @@ class MyBotLogic(BaseLogic):
         
         distance_bot_button = abs(current_position.x - button_position[0].x) + abs(current_position.y - button_position[0].y)
 
-        if (min_distance_base > 5 and distance_bot_button < min_distance_base):
+        if (min_distance > 5 and distance_bot_button < min_distance):
             is_using_button = True
         
         else:
