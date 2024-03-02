@@ -22,18 +22,14 @@ class MyBotLogic(BaseLogic):
         if props.diamonds == 5:
             target_teleport_position = self.using_teleport(board_bot, board)
             if self.is_using_teleport_to_base:
-                if self.goal_position != target_teleport_position:
-                    self.goal_position = base
-                else:
-                    self.is_using_teleport = True
+                self.goal_position = base
 
             elif not self.is_using_teleport_to_base:
                 self.goal_position = target_teleport_position
                 if target_teleport_position == current_position:
                     self.is_using_teleport = True
-
-            else:
-                self.goal_position = base
+                else:
+                    self.goal_position = base
 
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
