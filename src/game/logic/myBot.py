@@ -42,24 +42,16 @@ class MyBotLogic(BaseLogic):
             goal_tackle, min_distance_tackle = self.nearest_enemy(board_bot, board, min_distance_base)
             goal_button, is_using_button = self.using_button(board_bot, board, min_distance_base)
 
-            if (board_bot.properties.milliseconds_left < 9000):
-                if min_distance_base <= 2:
+            if (board_bot.properties.milliseconds_left < 15000):
+                if min_distance_base <= 5:
                     self.goal_position = goal_from_base
                 else:
                     self.goal_position = base
-            elif (board_bot.properties.milliseconds_left <= 25000):
-                if (min_distance_base > min_distance_tackle):
-                    self.goal_position = goal_tackle
-                else:
+            else : 
                     if is_using_button:
                         self.goal_position = goal_button
                     else:
-                        self.goal_position = goal_from_base
-            else:
-                if (min_distance_player < min_distance_tackle):
-                    self.goal_position = goal_from_player
-                else:
-                    self.goal_position = goal_tackle
+                        self.goal_position = goal_from_player
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -77,11 +69,14 @@ class MyBotLogic(BaseLogic):
         diamonds = board.diamonds
         if board_bot.properties.diamonds == 4:
             blue_diamonds = [diamond for diamond in diamonds if diamond.properties.points == 1]
-            current_position = board_bot.position
-            distances = [abs(current_position.x - diamond.position.x) + abs(board_bot.position.y - diamond.position.y) for diamond in blue_diamonds]
-            nearest_diamond_index = distances.index(min(distances))
-            diamond_from_bot = blue_diamonds[nearest_diamond_index].position
-            min_distance_diamond_bot = distances[nearest_diamond_index]
+            if (len(blue_diamonds)>0):
+                current_position = board_bot.position
+                distances = [abs(current_position.x - diamond.position.x) + abs(board_bot.position.y - diamond.position.y) for diamond in blue_diamonds]
+                nearest_diamond_index = distances.index(min(distances))
+                diamond_from_bot = blue_diamonds[nearest_diamond_index].position
+                min_distance_diamond_bot = distances[nearest_diamond_index]
+            else :
+                diamond_from_bot = board_bot.properties.base    
             return diamond_from_bot, min_distance_diamond_bot
         else:
             diamonds = [diamond for diamond in diamonds]
