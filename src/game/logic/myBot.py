@@ -170,7 +170,51 @@ class MyBotLogic(BaseLogic):
             is_using_button = False
 
         return button_position[0], is_using_button
+    
+    # jarak terdekat bot lawan    
+    def attack(self, board_bot: GameObject, board: Board):
+        enemy_bot_position: List[Position] = []
+        is_tackle = False
+        for enemy_bot in board.bots:
+            if (enemy_bot != board_bot):
+                diff_x = abs(enemy_bot.position.x - board_bot.position.x)
+                diff_y = abs(enemy_bot.position.y - board_bot.position.y)
+                if (enemy_bot.position.x == board_bot.position.x and diff_y == 1) or (enemy_bot.position.y == board_bot.position.y and diff_x == 1):
+                    enemy_bot_position.append(enemy_bot.position)
+
+        if len(enemy_bot_position) > 0:
+            is_tackle = True
+
+        # target kotak biar ga ditackle
+        if is_tackle:
+            return enemy_bot_position[0], is_tackle
         
+        else:
+            return None, is_tackle
         
+    # jarak terdekat bot lawan    
+    def defend(self, board_bot: GameObject, board: Board):
+        enemy_bot_position: List[Position] = []
+        is_tackle = False
+        for enemy_bot in board.bots:
+            if (enemy_bot != board_bot):
+                diff_x = abs(enemy_bot.position.x - board_bot.position.x)
+                diff_y = abs(enemy_bot.position.y - board_bot.position.y)
+                if (enemy_bot.position.x == board_bot.position.x and diff_y == 1) or (enemy_bot.position.y == board_bot.position.y and diff_x == 1):
+                    enemy_bot_position.append(enemy_bot.position)
+
+        if len(enemy_bot_position) > 0:
+            is_tackle = True
+
+        # target kotak biar ga ditackle
+        if is_tackle:
+            if(enemy_bot_position[0].x == board_bot.position.x):
+                return Position(board_bot.position.y, board_bot.position.x + 1), is_tackle
+            
+            elif(enemy_bot_position[0].y == board_bot.position.y):
+                return Position(board_bot.position.y + 1, board_bot.position.x), is_tackle
+        
+        else:
+            return None, is_tackle
         
     
