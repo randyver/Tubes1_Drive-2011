@@ -12,7 +12,7 @@ from game.util import *
 from game.logic.base import BaseLogic
 
 init()
-BASE_URL = "http://20.243.68.103:8082/api/"
+BASE_URL = "http://localhost:3000/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
