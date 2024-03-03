@@ -31,22 +31,26 @@ class MyBotLogic(BaseLogic):
             goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
             min_distance = min(min_distance_base, min_distance_player)
             goal_button, is_using_button = self.using_button(board_bot, board, min_distance)
+            goal_defend, is_defend, is_horizontal = self.defend(board_bot, board)
 
-            if (board_bot.properties.milliseconds_left < 7000):
-                if min_distance_base <= 2:
-                    self.goal_position = goal_from_base
+
+            if is_defend:
+                self.goal_position = goal_defend
+                if is_horizontal:
+                    self.goal_position = Position(goal_defend.y, goal_defend.x - 1)
                 else:
-                    self.goal_position = base
-            elif (board_bot.properties.milliseconds_left >= 7000 and board_bot.properties.milliseconds_left < 15000):
-                if min_distance_base <= 5:
-                    self.goal_position = goal_from_base
-                else:
-                    self.goal_position = base
-            else : 
-                    if is_using_button:
-                        self.goal_position = goal_button
+                    self.goal_position = Position(goal_defend.y - 1, goal_defend.x)
+            else:
+                if (board_bot.properties.milliseconds_left < 15000):
+                    if min_distance_base <= 5:
+                        self.goal_position = goal_from_base
                     else:
-                        self.goal_position = goal_from_player
+                        self.goal_position = base
+                else : 
+                        if is_using_button:
+                            self.goal_position = goal_button
+                        else:
+                            self.goal_position = goal_from_player
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -193,6 +197,7 @@ class MyBotLogic(BaseLogic):
     def defend(self, board_bot: GameObject, board: Board):
         enemy_bot_position: List[Position] = []
         is_tackle = False
+        is_horizontal = False
         for enemy_bot in board.bots:
             if (enemy_bot != board_bot):
                 diff_x = abs(enemy_bot.position.x - board_bot.position.x)
@@ -206,12 +211,13 @@ class MyBotLogic(BaseLogic):
         # target kotak biar ga ditackle
         if is_tackle:
             if(enemy_bot_position[0].x == board_bot.position.x):
-                return Position(board_bot.position.y, board_bot.position.x + 1), is_tackle
+                is_horizontal = True
+                return Position(board_bot.position.y, board_bot.position.x + 1), is_tackle, is_horizontal
             
             elif(enemy_bot_position[0].y == board_bot.position.y):
-                return Position(board_bot.position.y + 1, board_bot.position.x), is_tackle
+                return Position(board_bot.position.y + 1, board_bot.position.x), is_tackle, is_horizontal
         
         else:
-            return None, is_tackle
+            return None, is_tackle, is_horizontal
         
     

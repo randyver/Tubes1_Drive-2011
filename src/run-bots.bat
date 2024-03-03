@@ -1,5 +1,5 @@
 @echo off
-start cmd /c "python main.py --logic MyBot --email=test@email.com --name=drive2011 --password=123456 --team etimo"
+start cmd /c "python main.py --logic MyBot --email=drive2011@email.com --name=drive2011 --password=123456 --team etimo"
 start cmd /c "python main.py --logic testBot --email=test1@email.com --name=stima1 --password=123456 --team etimo"
 start cmd /c "python main.py --logic testBot --email=test2@email.com --name=stima2 --password=123456 --team etimo"
 start cmd /c "python main.py --logic testBot --email=test3@email.com --name=stima3 --password=123456 --team etimo"
