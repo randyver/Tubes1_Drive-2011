@@ -10,7 +10,6 @@ class MyBotLogic(BaseLogic):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
         self.current_direction = 0
-        self.is_using_teleport_to_base = False
         
     def next_move(self, board_bot: GameObject, board: Board):
 
@@ -20,16 +19,11 @@ class MyBotLogic(BaseLogic):
 
         # jika diamonds sudah 5
         if props.diamonds == 5:
-            target_teleport_position = self.using_teleport(board_bot, board)
-            if self.is_using_teleport_to_base:
-                self.goal_position = base
-
-            elif not self.is_using_teleport_to_base:
+            target_teleport_position, is_using_teleport = self.using_teleport(board_bot, board)
+            if is_using_teleport:
                 self.goal_position = target_teleport_position
-                if target_teleport_position == current_position:
-                    self.is_using_teleport = True
-                else:
-                    self.goal_position = base
+            else:
+                self.goal_position = base
 
         else:
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
@@ -119,6 +113,7 @@ class MyBotLogic(BaseLogic):
 
     # gunakan teleport saat pulang ke base (diamond sudah berjumlah 5)
     def using_teleport(self, board_bot: GameObject, board: Board):
+        is_using_teleport = False
         base = board_bot.properties.base
         current_position = board_bot.position
         teleport_objects: List[Position] = []
@@ -135,17 +130,18 @@ class MyBotLogic(BaseLogic):
 
         if distance_teleport_first_from_bot <= distance_teleport_second_from_bot:
             if (distance_teleport_first_from_bot + distance_teleport_second_from_base) <= distance_bot_from_base:
-                target_position = teleport_objects[0]
+                is_using_teleport = True
+                return teleport_objects[0], is_using_teleport
             else:
-                target_position = base
+                return None, is_using_teleport
 
         else:
             if (distance_teleport_second_from_bot + distance_teleport_first_from_base) <= distance_bot_from_base:
-                target_position = teleport_objects[1]
+                is_using_teleport = True
+                return teleport_objects[1], is_using_teleport
             else:
-                target_position = base
-
-        return target_position
+                return None, is_using_teleport
+        
 
     # menggunakan button jika posisi diamonds jauh dari bot sehingga memungkinkan bot memperoleh diamond lebih dekat      
     def using_button(self, board_bot: GameObject, board: Board, min_distance: int):
