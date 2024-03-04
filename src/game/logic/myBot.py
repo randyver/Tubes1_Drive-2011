@@ -17,6 +17,8 @@ class MyBotLogic(BaseLogic):
         current_position = board_bot.position
         base = board_bot.properties.base
 
+        print(f"Posisi bot: ({current_position.x}, {current_position.y})")
+
         # jika diamonds sudah 5
         if props.diamonds == 5:
             target_teleport_position, is_using_teleport = self.using_teleport(board_bot, board)
@@ -35,11 +37,15 @@ class MyBotLogic(BaseLogic):
             if (board_bot.properties.milliseconds_left < 7000):
                 if min_distance_base <= 2:
                     self.goal_position = goal_from_base
+                    print("Bot mengambil diamond terdekat dengan base")
+                    print(f"Posisi diamond target: ({goal_from_base.x}, {goal_from_base.y})")
                 else:
                     self.goal_position = base
             elif (board_bot.properties.milliseconds_left >= 7000 and board_bot.properties.milliseconds_left < 15000):
                 if min_distance_base <= 5:
                     self.goal_position = goal_from_base
+                    print("Bot mengambil diamond terdekat dengan base")
+                    print(f"Posisi diamond target: ({goal_from_base.x}, {goal_from_base.y})")
                 else:
                     self.goal_position = base
             else : 
@@ -47,6 +53,8 @@ class MyBotLogic(BaseLogic):
                         self.goal_position = goal_button
                     else:
                         self.goal_position = goal_from_player
+                        print("Bot mengambil diamond terdekat dengan bot")
+                        print(f"Posisi diamond target: ({goal_from_player.x}, {goal_from_player.y})")
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -100,7 +108,7 @@ class MyBotLogic(BaseLogic):
                 diamond_distance = abs(diamond.position.x - base.x) + abs(diamond.position.y - base.y)
                 if diamond_distance < min_distance_diamond_base:
                     min_distance_diamond_base = diamond_distance
-                    diamond_from_base = diamond.position    
+                    diamond_from_base = diamond.position
             return diamond_from_base, min_distance_diamond_base
         
     # jarak terdekat bot lawan    
@@ -136,6 +144,8 @@ class MyBotLogic(BaseLogic):
         if distance_teleport_first_from_bot <= distance_teleport_second_from_bot:
             if (distance_teleport_first_from_bot + distance_teleport_second_from_base) <= distance_bot_from_base:
                 is_using_teleport = True
+                print("Menggunakan teleport")
+                print(f"Posisi teleport: ({teleport_objects[0].x}, {teleport_objects[0].y})")
                 return teleport_objects[0], is_using_teleport
             else:
                 return None, is_using_teleport
@@ -143,6 +153,8 @@ class MyBotLogic(BaseLogic):
         else:
             if (distance_teleport_second_from_bot + distance_teleport_first_from_base) <= distance_bot_from_base:
                 is_using_teleport = True
+                print("Menggunakan teleport")
+                print(f"Posisi teleport: ({teleport_objects[1].x}, {teleport_objects[1].y})")
                 return teleport_objects[1], is_using_teleport
             else:
                 return None, is_using_teleport
@@ -162,9 +174,12 @@ class MyBotLogic(BaseLogic):
 
         if (min_distance > 5 and distance_bot_button < min_distance):
             is_using_button = True
-        
         else:
             is_using_button = False
+        
+        if is_using_button:
+            print("Menggunakan red button")
+            print(f"Posisi red button: ({button_position[0].x}, {button_position[0].y})")
 
         return button_position[0], is_using_button
     
