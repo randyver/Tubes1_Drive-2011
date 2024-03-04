@@ -10,6 +10,9 @@ from game.logic.myBot import MyBotLogic
 from game.logic.testBot import DummyBotLogic
 from game.util import *
 from game.logic.base import BaseLogic
+from game.logic.unused.collectChase import CollectChaseLogic
+from game.logic.unused.fullTackle import FullTackleLogic
+from game.logic.unused.begal import BegalLogic
 
 init()
 BASE_URL = "http://localhost:3000/api"
@@ -17,7 +20,10 @@ DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
     "MyBot" : MyBotLogic,
-    "testBot" : DummyBotLogic
+    "testBot" : DummyBotLogic,
+    "collectChase" : CollectChaseLogic,
+    "fullTackle" : FullTackleLogic,
+    "begal" : BegalLogic
 }
 
 ###############################################################################
