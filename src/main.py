@@ -12,6 +12,7 @@ from game.util import *
 from game.logic.base import BaseLogic
 from game.logic.unused.collectChase import CollectChaseLogic
 from game.logic.unused.fullTackle import FullTackleLogic
+from game.logic.unused.begal import BegalLogic
 
 init()
 BASE_URL = "http://localhost:3000/api"
@@ -21,7 +22,8 @@ CONTROLLERS = {
     "MyBot" : MyBotLogic,
     "testBot" : DummyBotLogic,
     "collectChase" : CollectChaseLogic,
-    "fullTackle" : FullTackleLogic
+    "fullTackle" : FullTackleLogic,
+    "begal" : BegalLogic
 }
 
 ###############################################################################
