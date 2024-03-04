@@ -33,12 +33,14 @@ class CollectChaseLogic(BaseLogic):
             goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
             if min_distance_base > min_distance_player:
                 goal_tackle, min_distance_tackle = self.chasing_enemy(board_bot, board, min_distance_player)
+                # Periksa apakah mengejar player lain lebih dekat
                 if (min_distance_player < min_distance_tackle):
                     self.goal_position = goal_from_player
                 else:
                     self.goal_position = goal_tackle
             else:
                 goal_tackle, min_distance_tackle = self.chasing_enemy(board_bot, board, min_distance_base)
+                # Periksa apakah mengejar player lain lebih dekat
                 if (min_distance_base < min_distance_tackle):
                     self.goal_position = goal_from_base
                 else:
