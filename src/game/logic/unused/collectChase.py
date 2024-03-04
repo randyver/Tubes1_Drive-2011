@@ -1,11 +1,13 @@
+# STRATEGI KOMBINASI COLLECTING DIAMONDS + CHASING ENEMY
+
 from typing import Optional, List
 
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
-from ..util import get_direction
+from ...util import get_direction
 
 
-class MyBotLogic(BaseLogic):
+class CollectChaseLogic(BaseLogic):
     def __init__(self):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
@@ -29,24 +31,18 @@ class MyBotLogic(BaseLogic):
             # Jika tidak ada tujuan spesifik, pilih langkah terbaik (greedy)
             goal_from_base, min_distance_base = self.nearest_diamond_from_base(board_bot, board)
             goal_from_player, min_distance_player = self.nearest_diamond_from_bot(board_bot, board)
-            min_distance = min(min_distance_base, min_distance_player)
-            goal_button, is_using_button = self.using_button(board_bot, board, min_distance)
-
-            if (board_bot.properties.milliseconds_left < 7000):
-                if min_distance_base <= 2:
+            if min_distance_base > min_distance_player:
+                goal_tackle, min_distance_tackle = self.chasing_enemy(board_bot, board, min_distance_player)
+                if (min_distance_player < min_distance_tackle):
+                    self.goal_position = goal_from_player
+                else:
+                    self.goal_position = goal_tackle
+            else:
+                goal_tackle, min_distance_tackle = self.chasing_enemy(board_bot, board, min_distance_base)
+                if (min_distance_base < min_distance_tackle):
                     self.goal_position = goal_from_base
                 else:
-                    self.goal_position = base
-            elif (board_bot.properties.milliseconds_left >= 7000 and board_bot.properties.milliseconds_left < 15000):
-                if min_distance_base <= 5:
-                    self.goal_position = goal_from_base
-                else:
-                    self.goal_position = base
-            else : 
-                    if is_using_button:
-                        self.goal_position = goal_button
-                    else:
-                        self.goal_position = goal_from_player
+                    self.goal_position = goal_tackle
 
         if self.goal_position:
             # Arahkan ke posisi tujuan
@@ -146,72 +142,3 @@ class MyBotLogic(BaseLogic):
                 return teleport_objects[1], is_using_teleport
             else:
                 return None, is_using_teleport
-        
-
-    # menggunakan button jika posisi diamonds jauh dari bot sehingga memungkinkan bot memperoleh diamond lebih dekat      
-    def using_button(self, board_bot: GameObject, board: Board, min_distance: int):
-        current_position = board_bot.position
-        button_position: List[Position] = []
-
-        for game_object in board.game_objects:
-            if game_object.type == "DiamondButtonGameObject":
-                button_position.append(game_object.position)
-                break
-        
-        distance_bot_button = abs(current_position.x - button_position[0].x) + abs(current_position.y - button_position[0].y)
-
-        if (min_distance > 5 and distance_bot_button < min_distance):
-            is_using_button = True
-        
-        else:
-            is_using_button = False
-
-        return button_position[0], is_using_button
-    
-    # jarak terdekat bot lawan    
-    def attack(self, board_bot: GameObject, board: Board):
-        enemy_bot_position: List[Position] = []
-        is_tackle = False
-        for enemy_bot in board.bots:
-            if (enemy_bot != board_bot):
-                diff_x = abs(enemy_bot.position.x - board_bot.position.x)
-                diff_y = abs(enemy_bot.position.y - board_bot.position.y)
-                if (enemy_bot.position.x == board_bot.position.x and diff_y == 1) or (enemy_bot.position.y == board_bot.position.y and diff_x == 1):
-                    enemy_bot_position.append(enemy_bot.position)
-
-        if len(enemy_bot_position) > 0:
-            is_tackle = True
-
-        # target kotak biar ga ditackle
-        if is_tackle:
-            return enemy_bot_position[0], is_tackle
-        
-        else:
-            return None, is_tackle
-        
-    # jarak terdekat bot lawan    
-    def defend(self, board_bot: GameObject, board: Board):
-        enemy_bot_position: List[Position] = []
-        is_tackle = False
-        for enemy_bot in board.bots:
-            if (enemy_bot != board_bot):
-                diff_x = abs(enemy_bot.position.x - board_bot.position.x)
-                diff_y = abs(enemy_bot.position.y - board_bot.position.y)
-                if (enemy_bot.position.x == board_bot.position.x and diff_y == 1) or (enemy_bot.position.y == board_bot.position.y and diff_x == 1):
-                    enemy_bot_position.append(enemy_bot.position)
-
-        if len(enemy_bot_position) > 0:
-            is_tackle = True
-
-        # target kotak biar ga ditackle
-        if is_tackle:
-            if(enemy_bot_position[0].x == board_bot.position.x):
-                return Position(board_bot.position.y, board_bot.position.x + 1), is_tackle
-            
-            elif(enemy_bot_position[0].y == board_bot.position.y):
-                return Position(board_bot.position.y + 1, board_bot.position.x), is_tackle
-        
-        else:
-            return None, is_tackle
-        
-    
